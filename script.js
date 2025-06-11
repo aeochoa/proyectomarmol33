@@ -267,15 +267,29 @@ class ChatApp {
     addBotResponse(response) {
         let message = '';
         
+        // Debug: log the response to see what we're getting
+        console.log('Webhook response:', response);
+        
         if (response && typeof response === 'object') {
             if (response.message) {
                 message = response.message;
-            } else if (response.text) {
-                message = response.text;
             } else if (response.response) {
                 message = response.response;
+            } else if (response.text) {
+                message = response.text;
+            } else if (response.aiResponse) {
+                message = response.aiResponse;
+            } else if (response.finalResponse) {
+                message = response.finalResponse;
+            } else if (response.output) {
+                message = response.output;
+            } else if (response.content) {
+                message = response.content;
+            } else if (response.success === false && response.error) {
+                message = 'Error: ' + response.error;
             } else {
-                message = 'Respuesta procesada correctamente.';
+                // Si viene como objeto pero no tiene las propiedades esperadas
+                message = JSON.stringify(response, null, 2);
             }
         } else if (typeof response === 'string') {
             message = response;
