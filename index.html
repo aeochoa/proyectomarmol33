@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <div class="avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="header-text">
+                    <h1>AI Chat Assistant</h1>
+                    <p class="status">En línea</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p>¡Hola! Soy tu asistente de IA. Puedes hacerme preguntas o enviar archivos para que los analice.</p>
+                    <span class="message-time">Ahora</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="file-upload-area" id="fileUploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Arrastra archivos aquí o haz clic para seleccionar</p>
+                <input type="file" id="fileInput" multiple accept="*/*">
+            </div>
+            
+            <div class="input-wrapper">
+                <div class="file-preview" id="filePreview"></div>
+                <div class="input-container">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Escribe tu mensaje aquí..." 
+                        rows="1"
+                    ></textarea>
+                    <button id="fileButton" class="file-button" title="Adjuntar archivo">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button id="sendButton" class="send-button" title="Enviar mensaje">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Procesando con IA...</p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
