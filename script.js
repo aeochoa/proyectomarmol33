@@ -230,7 +230,9 @@ class ChatApp {
         avatarDiv.className = 'message-avatar';
         avatarDiv.innerHTML = sender === 'user' ? 
             '<i class="fas fa-user"></i>' : 
-            '<i class="fas fa-robot"></i>';
+            `<div class="avatar-logo">
+                <img src="https://ik.imagekit.io/1vwnxv8bn/Dise%C3%B1o%20sin%20t%C3%ADtulo.png?updatedAt=1749682949597" alt="Manuable" class="avatar-logo-img"/>
+            </div>`;
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';

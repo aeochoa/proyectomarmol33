@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat Assistant</title>
+    <title>Manuable Pricing Assistant</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNBODU1RjciLz4KPC9zdmc+">
+    <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNBODU1RjciLz4KPC9zdmc+">
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
             <div class="header-content">
-                <div class="avatar">
-                    <i class="fas fa-robot"></i>
+                <div class="company-logo">
+                    <div class="manuable-logo">
+                        <img src="https://ik.imagekit.io/1vwnxv8bn/M_Logo_Hrz_ESP_CW%20-%20copia.png?updatedAt=1749682388954" alt="Manuable" class="logo-image"/>
+                    </div>
                 </div>
                 <div class="header-text">
-                    <h1>AI Chat Assistant</h1>
-                    <p class="status">En línea</p>
+                    <h1>Manu</h1>
+                    <p class="status">Tu Asistente personal de Manuable</p>
+                </div>
+                <div class="pricing-badge">
+                    <i class="fas fa-calculator"></i>
                 </div>
             </div>
         </div>
@@ -24,10 +31,12 @@
         <div class="chat-messages" id="chatMessages">
             <div class="message bot-message">
                 <div class="message-avatar">
-                    <i class="fas fa-robot"></i>
+                    <div class="avatar-logo">
+                        <img src="https://ik.imagekit.io/1vwnxv8bn/Dise%C3%B1o%20sin%20t%C3%ADtulo.png?updatedAt=1749682949597" alt="Manuable" class="avatar-logo-img"/>
+                    </div>
                 </div>
                 <div class="message-content">
-                    <p>¡Hola! Soy tu asistente de IA. Puedes hacerme preguntas o enviar archivos para que los analice.</p>
+                    <p>Hola! ¿Qué puedo hacer por ti hoy?</p>
                     <span class="message-time">Ahora</span>
                 </div>
             </div>
@@ -43,11 +52,11 @@
             <div class="input-wrapper">
                 <div class="file-preview" id="filePreview"></div>
                 <div class="input-container">
-                    <textarea 
-                        id="messageInput" 
-                        placeholder="Escribe tu mensaje aquí..." 
-                        rows="1"
-                    ></textarea>
+                                    <textarea 
+                    id="messageInput" 
+                    placeholder="Listo cuando tu lo estés..." 
+                    rows="1"
+                ></textarea>
                     <button id="fileButton" class="file-button" title="Adjuntar archivo">
                         <i class="fas fa-paperclip"></i>
                     </button>
@@ -61,8 +70,10 @@
     
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Procesando con IA...</p>
+            <div class="loading-logo">
+                <img src="https://ik.imagekit.io/1vwnxv8bn/M_Logo_Hrz_ESP_CW%20-%20copia.png?updatedAt=1749682388954" alt="Manuable" class="spin-logo-img"/>
+            </div>
+            <p>Calculando cotización...</p>
         </div>
     </div>
     

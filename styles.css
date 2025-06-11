@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #A855F7 0%, #1a1a1a 100%);
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -27,27 +27,84 @@ body {
 }
 
 .chat-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #A855F7 0%, #1a1a1a 100%);
     color: white;
     padding: 20px;
     border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1.5" fill="rgba(255,255,255,0.08)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    pointer-events: none;
 }
 
 .header-content {
     display: flex;
     align-items: center;
     gap: 15px;
+    position: relative;
+    z-index: 1;
 }
 
-.avatar {
+.company-logo {
     width: 50px;
     height: 50px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.manuable-logo {
+    width: 40px;
+    height: 40px;
+}
+
+.manuable-logo svg,
+.logo-image {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    object-fit: contain;
+}
+
+.avatar-logo {
+    width: 50px;
+    height: 50px;
+}
+
+.avatar-logo svg,
+.avatar-logo-img {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.pricing-badge {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 18px;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-left: auto;
 }
 
 .header-text h1 {
@@ -98,8 +155,8 @@ body {
 }
 
 .message-avatar {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -109,13 +166,17 @@ body {
 }
 
 .bot-message .message-avatar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: transparent;
     color: white;
+    border: 3px solid #A855F7;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
 }
 
 .user-message .message-avatar {
     background: #f0f2f5;
-    color: #667eea;
+    color: #8973DC;
+    border: 2px solid rgba(137, 115, 220, 0.2);
 }
 
 .message-content {
@@ -126,8 +187,9 @@ body {
 }
 
 .user-message .message-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8973DC 0%, #1a1a1a 100%);
     color: white;
+    border: 1px solid rgba(137, 115, 220, 0.3);
 }
 
 .message-content p {
@@ -165,14 +227,14 @@ body {
 
 .file-upload-area {
     display: none;
-    border: 2px dashed #667eea;
+    border: 2px dashed #8973DC;
     border-radius: 12px;
     padding: 30px;
     text-align: center;
     margin-bottom: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(137, 115, 220, 0.05);
 }
 
 .file-upload-area.active {
@@ -180,18 +242,18 @@ body {
 }
 
 .file-upload-area:hover {
-    background: rgba(102, 126, 234, 0.1);
-    border-color: #764ba2;
+    background: rgba(137, 115, 220, 0.1);
+    border-color: #1a1a1a;
 }
 
 .file-upload-area i {
     font-size: 32px;
-    color: #667eea;
+    color: #8973DC;
     margin-bottom: 10px;
 }
 
 .file-upload-area p {
-    color: #667eea;
+    color: #8973DC;
     font-weight: 500;
 }
 
@@ -224,7 +286,7 @@ body {
 }
 
 .file-item i {
-    color: #667eea;
+    color: #8973DC;
 }
 
 .file-remove {
@@ -290,22 +352,25 @@ body {
 
 .file-button {
     background: #f8f9fa;
-    color: #667eea;
+    color: #8973DC;
+    border: 1px solid rgba(137, 115, 220, 0.2);
 }
 
 .file-button:hover {
-    background: #e9ecef;
+    background: rgba(137, 115, 220, 0.1);
     transform: rotate(15deg);
+    border-color: #8973DC;
 }
 
 .send-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8973DC 0%, #1a1a1a 100%);
     color: white;
+    border: 1px solid rgba(137, 115, 220, 0.3);
 }
 
 .send-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(137, 115, 220, 0.4);
 }
 
 .send-button:disabled {
@@ -339,10 +404,23 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.loading-spinner i {
-    font-size: 32px;
-    color: #667eea;
-    margin-bottom: 15px;
+.loading-logo {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 15px;
+}
+
+.spin-logo,
+.spin-logo-img {
+    width: 100%;
+    height: 100%;
+    animation: spin 2s linear infinite;
+    object-fit: contain;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .loading-spinner p {
@@ -361,12 +439,12 @@ body {
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-    background: #667eea;
+    background: #8973DC;
     border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #764ba2;
+    background: #1a1a1a;
 }
 
 /* Responsive */
@@ -389,11 +467,31 @@ body {
         font-size: 20px;
     }
     
-    .avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
+            .company-logo {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .manuable-logo {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .avatar-logo {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .pricing-badge {
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+        }
     
     .message {
         max-width: 85%;
