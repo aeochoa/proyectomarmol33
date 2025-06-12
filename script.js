@@ -1,6 +1,6 @@
 class ChatApp {
     constructor() {
-        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook-test/whatsapp-chatbot';
+        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook/whatsapp-chatbot';
         this.selectedFiles = [];
         this.initializeElements();
         this.attachEventListeners();
