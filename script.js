@@ -1,6 +1,6 @@
 class ChatApp {
     constructor() {
-        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook/whatsapp-chatbot';
+        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook-test/199ffb4d-2fb1-441f-b940-685714d26c0f';
         this.selectedFiles = [];
         this.initializeElements();
         this.attachEventListeners();
@@ -42,20 +42,20 @@ class ChatApp {
         // Drag and drop events
         this.fileUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            this.fileUploadArea.style.borderColor = '#764ba2';
-            this.fileUploadArea.style.background = 'rgba(102, 126, 234, 0.15)';
+            this.fileUploadArea.style.borderColor = '#A855F7';
+            this.fileUploadArea.style.background = 'rgba(168, 85, 247, 0.15)';
         });
 
         this.fileUploadArea.addEventListener('dragleave', (e) => {
             e.preventDefault();
-            this.fileUploadArea.style.borderColor = '#667eea';
-            this.fileUploadArea.style.background = 'rgba(102, 126, 234, 0.05)';
+            this.fileUploadArea.style.borderColor = '#A855F7';
+            this.fileUploadArea.style.background = 'rgba(168, 85, 247, 0.05)';
         });
 
         this.fileUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            this.fileUploadArea.style.borderColor = '#667eea';
-            this.fileUploadArea.style.background = 'rgba(102, 126, 234, 0.05)';
+            this.fileUploadArea.style.borderColor = '#A855F7';
+            this.fileUploadArea.style.background = 'rgba(168, 85, 247, 0.05)';
             this.handleFileSelection({ target: { files: e.dataTransfer.files } });
         });
 
@@ -148,10 +148,13 @@ class ChatApp {
         // Disable send button
         this.sendButton.disabled = true;
 
+        // GUARDAR los archivos antes de limpiar
+        const filesToSend = [...this.selectedFiles];
+        
         // Add user message to chat
         this.addMessageToChat(message, this.selectedFiles, 'user');
 
-        // Clear inputs
+        // Clear inputs DESPUÉS de guardar
         this.messageInput.value = '';
         this.selectedFiles = [];
         this.updateFilePreview();
@@ -161,13 +164,12 @@ class ChatApp {
         this.showLoading();
 
         try {
-            // Send to webhook
-            const response = await this.sendToWebhook(message, this.selectedFiles);
+            // Send to webhook con los archivos guardados
+            const response = await this.sendToWebhook(message, filesToSend);
             
             // Add bot response
             this.addBotResponse(response);
         } catch (error) {
-            console.error('Error sending message:', error);
             this.addBotResponse({
                 success: false,
                 message: 'Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.'
@@ -206,7 +208,8 @@ class ChatApp {
 
         // Try to parse as JSON, if it fails, return as text
         try {
-            return await response.json();
+            const jsonResponse = await response.json();
+            return jsonResponse;
         } catch {
             const text = await response.text();
             return { success: true, message: text };
@@ -269,9 +272,6 @@ class ChatApp {
     addBotResponse(response) {
         let message = '';
         
-        // Debug: log the response to see what we're getting
-        console.log('Webhook response:', response);
-        
         if (response && typeof response === 'object') {
             if (response.message) {
                 message = response.message;
@@ -290,7 +290,6 @@ class ChatApp {
             } else if (response.success === false && response.error) {
                 message = 'Error: ' + response.error;
             } else {
-                // Si viene como objeto pero no tiene las propiedades esperadas
                 message = JSON.stringify(response, null, 2);
             }
         } else if (typeof response === 'string') {
@@ -344,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // Handle page visibility changes to maintain connection
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
-        // Page is visible again, could implement reconnection logic here
-        console.log('Chat app is active');
+        // Eliminar log de la terminal
     }
 }); 
