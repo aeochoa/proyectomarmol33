@@ -504,4 +504,65 @@ body {
     .chat-input-container {
         padding: 15px;
     }
+}
+
+/* Detected Links Styles */
+.detected-links {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #A855F7;
+}
+
+.user-message .detected-links {
+    background: rgba(255, 255, 255, 0.15);
+    border-left: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.detected-links small {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #A855F7;
+}
+
+.user-message .detected-links small {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.link-item {
+    margin: 4px 0;
+}
+
+.link-item a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #A855F7;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.user-message .link-item a {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.link-item a:hover {
+    background: rgba(168, 85, 247, 0.15);
+    transform: translateX(2px);
+}
+
+.user-message .link-item a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.link-item a i {
+    font-size: 11px;
+    opacity: 0.7;
 } 
