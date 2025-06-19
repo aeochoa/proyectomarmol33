@@ -1,6 +1,6 @@
 class ChatApp {
     constructor() {
-        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook-test/whatsapp-chatbot';
+        this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook/whatsapp-chatbot';
         this.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbxmXrGsQovpa7lX8dDR2Hm7XbE2B0owCR8ho9p0W1prnNqa-pEmrq1pqJGwKsJlXqlQ2w/exec'; // Google Apps Script directo
         this.selectedFiles = [];
         this.initializeElements();
