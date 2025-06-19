@@ -1,6 +1,7 @@
 class ChatApp {
     constructor() {
         this.webhookUrl = 'https://emilianoochoa.app.n8n.cloud/webhook-test/whatsapp-chatbot';
+        this.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbxmXrGsQovpa7lX8dDR2Hm7XbE2B0owCR8ho9p0W1prnNqa-pEmrq1pqJGwKsJlXqlQ2w/exec'; // Google Apps Script directo
         this.selectedFiles = [];
         this.initializeElements();
         this.attachEventListeners();
@@ -187,6 +188,9 @@ class ChatApp {
         // Add user message to chat
         this.addMessageToChat(message, this.selectedFiles, 'user');
 
+        // Guardar mensaje del usuario en Google Sheets
+        await this.saveMessageToGoogleSheets(message, filesToSend, 'user');
+
         // Clear inputs DESPUÉS de guardar
         this.messageInput.value = '';
         this.selectedFiles = [];
@@ -202,6 +206,18 @@ class ChatApp {
             
             // Add bot response
             this.addBotResponse(response);
+            
+            // Guardar respuesta del bot en Google Sheets
+            let botMessage = '';
+            if (response.message) {
+                botMessage = response.message;
+            } else if (typeof response === 'string') {
+                botMessage = response;
+            }
+            
+            if (botMessage) {
+                await this.saveMessageToGoogleSheets('', [], 'bot', botMessage);
+            }
         } catch (error) {
             console.error('Error en sendMessage:', error);
             this.addBotResponse({
@@ -357,6 +373,67 @@ class ChatApp {
         }
     }
 
+    async saveMessageToGoogleSheets(message, files, sender, botResponse = null) {
+        try {
+            const payload = {
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString('es-CO'),
+                time: new Date().toLocaleTimeString('es-CO'),
+                user_id: this.getUserId(),
+                sender: sender, // 'user' or 'bot'
+                message: message || '',
+                has_files: files ? files.length > 0 : false,
+                files_count: files ? files.length : 0,
+                file_names: files && files.length > 0 ? files.map(f => f.name).join(', ') : '',
+                bot_response: botResponse || '',
+                session_id: this.getSessionId()
+            };
+
+            console.log('🔍 Intentando guardar mensaje en Google Sheets:', payload);
+            console.log('🌐 URL destino:', this.googleSheetsUrl);
+
+            const response = await fetch(this.googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Agregar modo no-cors para evitar problemas de CORS
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            console.log('📡 Respuesta recibida - Status:', response.status);
+            console.log('📡 Respuesta recibida - Type:', response.type);
+            
+            // Con no-cors, response.ok siempre será false, pero si no hay error de red, funcionó
+            if (response.type === 'opaque') {
+                console.log('✅ Mensaje enviado a Google Sheets (modo no-cors)');
+            } else if (response.ok) {
+                console.log('✅ Mensaje guardado exitosamente en Google Sheets');
+                const responseText = await response.text();
+                console.log('📄 Respuesta:', responseText);
+            } else {
+                console.error('❌ Error al guardar en Google Sheets:', response.status, response.statusText);
+                const errorText = await response.text();
+                console.error('📄 Error details:', errorText);
+            }
+        } catch (error) {
+            console.error('❌ Error completo al guardar mensaje en Google Sheets:', error);
+            console.error('📍 Error name:', error.name);
+            console.error('📍 Error message:', error.message);
+            console.error('📍 Error stack:', error.stack);
+            // No mostramos error al usuario para no interrumpir la experiencia del chat
+        }
+    }
+
+    getSessionId() {
+        let sessionId = sessionStorage.getItem('chat_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('chat_session_id', sessionId);
+        }
+        return sessionId;
+    }
+
     getUserId() {
         let userId = localStorage.getItem('chat_user_id');
         if (!userId) {
@@ -455,7 +532,7 @@ class ChatApp {
         }
         
         const errorReason = response.error || '';
-        const formattedMessage = this.formatMarkdown(message);
+        const formattedMessage = this.formatHTML(message);
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot-message';
         
@@ -491,23 +568,175 @@ class ChatApp {
         this.scrollToBottom();
     }
 
-    formatMarkdown(text) {
-        // Reemplazar encabezados (#)
-        text = text.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-        text = text.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-        text = text.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+    formatHTML(text) {
+        // Clean up common AI response patterns
+        text = text.trim();
+        
+        // Detect and reject programming code responses
+        const codePatterns = [
+            /\$\w+\s*=\s*/, // PHP variables
+            /<\?php/i, // PHP opening tags
+            /\?>/i, // PHP closing tags
+            /function\s*\(/i, // Function declarations
+            /if\s*\(/i, // If statements
+            /for\s*\(/i, // For loops
+            /while\s*\(/i, // While loops
+            /console\.log/i, // JavaScript console
+            /def\s+\w+\s*\(/i, // Python functions
+            /import\s+\w+/i, // Import statements
+        ];
+        
+        // Detect placeholder values (fake data)
+        const placeholderPatterns = [
+            /\$X,XXX\.XX/gi, // $X,XXX.XX
+            /\$XXX\.XX/gi, // $XXX.XX (but not $123.45)
+            /\$X+[,.]X+/gi, // $XXXX.XX, etc. but not real numbers
+            /\[valor\]/gi, // [valor]
+            /\[cantidad\]/gi, // [cantidad]
+            /\[dato\]/gi, // [dato]
+        ];
+        
+        // More specific detection - avoid false positives
+        const hasRealPlaceholders = text.match(/\$X,XXX\.XX/gi) || 
+                                   text.match(/\$XXX\.XX/gi) ||
+                                   text.match(/\$X{3,}/gi) || // Multiple X's
+                                   text.match(/\[valor\]/gi) ||
+                                   text.match(/\[cantidad\]/gi) ||
+                                   text.match(/\[dato\]/gi);
+        
+        // Don't flag legitimate $0.00 or real currency values
+        const hasRealCurrency = text.match(/\$\d+\.\d{2}/g);
+        
+        // Count how many real currency values vs placeholders
+        const realCurrencyCount = (text.match(/\$\d+,?\d*\.\d{2}/g) || []).length;
+        const placeholderCount = (text.match(/\$X+,?X*\.X+/gi) || []).length;
+        
+        // Check if response contains programming code
+        const containsCode = codePatterns.some(pattern => pattern.test(text));
+        
+        // Only flag as placeholder if:
+        // 1. Has placeholders AND
+        // 2. Has few or no real currency values OR placeholder count > real currency count
+        const containsPlaceholders = hasRealPlaceholders && 
+                                   (realCurrencyCount === 0 || placeholderCount > realCurrencyCount * 0.1);
+        
+        if (containsCode) {
+            // Return a user-friendly message instead of code
+            return `
+                <div style="padding: 16px; background: rgba(255, 107, 107, 0.1); border-left: 4px solid #ff6b6b; border-radius: 8px;">
+                    <strong>⚠️ Error de Formato</strong><br>
+                    La IA respondió con código de programación en lugar de análisis de datos.<br>
+                    <small>Por favor, reformula tu pregunta pidiendo específicamente un análisis visual de los datos.</small>
+                </div>
+            `;
+        }
+        
+        if (containsPlaceholders) {
+            // Return a message indicating fake data was detected
+            return `
+                <div style="padding: 16px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; border-radius: 8px;">
+                    <strong>📊 Datos Faltantes</strong><br>
+                    La IA respondió con valores de ejemplo (como $X,XXX.XX) en lugar de datos reales.<br>
+                    <small>Para obtener un análisis preciso, necesitas subir los archivos de Excel con los datos específicos de costos y ventas.</small>
+                </div>
+            `;
+        }
+        
+        // If has some placeholders but mostly real data, process it but add a warning
+        if (hasRealPlaceholders && realCurrencyCount > 0) {
+            text = text.replace(/\$X+,?X*\.X+/gi, '<span style="background: yellow; padding: 2px 4px; border-radius: 3px;">⚠️ CÁLCULO PENDIENTE</span>');
+        }
+        
+        // Remove common HTML wrapper patterns that AIs might add
+        // Handle various quote patterns: '''html, ```html, "html, 'html
+        if (text.match(/^['"`]{1,3}html/i)) {
+            text = text.replace(/^['"`]{1,3}html['"` \n\r]*/i, '');
+        }
+        
+        // Remove ending quotes/backticks
+        if (text.match(/['"`]{1,3}$/)) {
+            text = text.replace(/['"`]{1,3}$/g, '');
+        }
+        
+        // Remove markdown code block markers at start
+        if (text.startsWith('```')) {
+            text = text.replace(/^```[a-z]*\n?/i, '');
+        }
+        
+        // Remove markdown code block markers at end
+        if (text.endsWith('```')) {
+            text = text.replace(/```$/g, '');
+        }
+        
+        // Remove quotes at the beginning and end if they wrap the entire content
+        text = text.trim();
+        if ((text.startsWith('"') && text.endsWith('"')) || 
+            (text.startsWith("'") && text.endsWith("'")) ||
+            (text.startsWith("`") && text.endsWith("`"))) {
+            text = text.slice(1, -1);
+        }
+        
+        // Clean up any remaining wrapper patterns
+        text = text.replace(/^html\s*/i, ''); // Remove standalone "html" at start
+        text = text.trim();
+        
+        // First, handle line breaks - convert \n to <br> if not already HTML
+        if (!text.includes('<') && text.includes('\n')) {
+            text = text.replace(/\n/g, '<br>');
+        }
+        
+        // Convert markdown-style formatting to HTML if not already in HTML
+        if (!text.includes('<table') && !text.includes('<ul') && !text.includes('<ol')) {
+            // Convert markdown headers to HTML if they exist
+            text = text.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+            text = text.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+            text = text.replace(/^# (.*$)/gm, '<h1>$1</h1>');
 
-        // Reemplazar negrita (**)
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Convert markdown bold and italic
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-        // Reemplazar cursiva (*)
-        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-        // Reemplazar listas con viñetas
-        text = text.replace(/^\* (.*$)/gm, '<li>$1</li>');
-        text = text.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
-
-        return text;
+            // Convert markdown lists to HTML
+            text = text.replace(/^\* (.*$)/gm, '<li>$1</li>');
+            text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
+            
+            // Wrap consecutive <li> elements in <ul>
+            text = text.replace(/(<li>.*?<\/li>)(\s*<li>.*?<\/li>)*/gs, function(match) {
+                return '<ul>' + match + '</ul>';
+            });
+        }
+        
+        // Clean up any potential XSS while preserving safe HTML
+        const allowedTags = [
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'p', 'br', 'strong', 'b', 'em', 'i', 'u',
+            'ul', 'ol', 'li',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td',
+            'div', 'span', 'blockquote',
+            'code', 'pre'
+        ];
+        
+        // Create a temporary div to safely parse HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Remove any script tags or dangerous attributes
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => script.remove());
+        
+        // Remove dangerous attributes
+        const allElements = tempDiv.querySelectorAll('*');
+        allElements.forEach(element => {
+            const attrs = element.attributes;
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                const attr = attrs[i];
+                if (attr.name.startsWith('on') || attr.name === 'javascript:') {
+                    element.removeAttribute(attr.name);
+                }
+            }
+        });
+        
+        return tempDiv.innerHTML;
     }
 
     escapeHtml(text) {
@@ -554,4 +783,62 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
         // Eliminar log de la terminal
     }
-}); 
+});
+
+function detectMathErrors(text) {
+    const mathErrors = [];
+    
+    // Buscar patrones de cálculos comunes que pueden estar mal
+    const multiplicationPattern = /\$?([\d,]+\.?\d*)\s*[×x*]\s*([\d,]+\.?\d*)\s*=\s*\$?([\d,]+\.?\d*)/gi;
+    
+    let match;
+    while ((match = multiplicationPattern.exec(text)) !== null) {
+        const num1 = parseFloat(match[1].replace(/,/g, ''));
+        const num2 = parseFloat(match[2].replace(/,/g, ''));
+        const claimed = parseFloat(match[3].replace(/,/g, ''));
+        const actual = num1 * num2;
+        
+        if (Math.abs(actual - claimed) > 0.01) {
+            mathErrors.push({
+                operation: `${num1} × ${num2}`,
+                claimed: claimed,
+                actual: actual.toFixed(2),
+                error: `Calculó ${claimed}, debería ser ${actual.toFixed(2)}`
+            });
+        }
+    }
+    
+    return mathErrors;
+}
+
+function showMathErrorWarning(errors) {
+    if (errors.length === 0) return '';
+    
+    let warningHtml = '<div class="math-error-warning">';
+    warningHtml += '<h4>⚠️ Errores Matemáticos Detectados:</h4>';
+    warningHtml += '<ul>';
+    
+    errors.forEach(error => {
+        warningHtml += `<li><strong>${error.operation}</strong>: ${error.error}</li>`;
+    });
+    
+    warningHtml += '</ul>';
+    warningHtml += '<p><em>Considera verificar estos cálculos con la IA.</em></p>';
+    warningHtml += '</div>';
+    
+    return warningHtml;
+}
+
+function displayMessage(message, isUser, hasLinks = false, detectedLinks = []) {
+    // ... existing code ...
+    
+    if (!isUser) {
+        // Detectar errores matemáticos en respuestas de IA
+        const mathErrors = detectMathErrors(message);
+        if (mathErrors.length > 0) {
+            messageElement.innerHTML += showMathErrorWarning(mathErrors);
+        }
+    }
+    
+    // ... existing code ...
+} 

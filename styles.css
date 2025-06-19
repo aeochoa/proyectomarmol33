@@ -565,4 +565,260 @@ body {
 .link-item a i {
     font-size: 11px;
     opacity: 0.7;
+}
+
+/* HTML Formatting Styles for AI Responses */
+.message-content .message-text {
+    line-height: 1.6;
+}
+
+/* Headers */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+    margin: 16px 0 8px 0;
+    font-weight: 600;
+    color: inherit;
+}
+
+.message-content h1 { font-size: 1.5em; }
+.message-content h2 { font-size: 1.3em; }
+.message-content h3 { font-size: 1.2em; }
+.message-content h4 { font-size: 1.1em; }
+.message-content h5 { font-size: 1em; }
+.message-content h6 { font-size: 0.9em; }
+
+/* First header has no top margin */
+.message-content h1:first-child,
+.message-content h2:first-child,
+.message-content h3:first-child,
+.message-content h4:first-child,
+.message-content h5:first-child,
+.message-content h6:first-child {
+    margin-top: 0;
+}
+
+/* Lists */
+.message-content ul,
+.message-content ol {
+    margin: 12px 0;
+    padding-left: 20px;
+}
+
+.message-content li {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.message-content ul li {
+    list-style-type: disc;
+}
+
+.message-content ol li {
+    list-style-type: decimal;
+}
+
+/* Nested lists */
+.message-content ul ul,
+.message-content ol ol,
+.message-content ul ol,
+.message-content ol ul {
+    margin: 4px 0;
+}
+
+.message-content ul ul li {
+    list-style-type: circle;
+}
+
+.message-content ul ul ul li {
+    list-style-type: square;
+}
+
+/* Tables */
+.message-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-message .message-content table {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.message-content th,
+.message-content td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.user-message .message-content th,
+.user-message .message-content td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.message-content th {
+    background: rgba(168, 85, 247, 0.1);
+    font-weight: 600;
+    color: #A855F7;
+}
+
+.user-message .message-content th {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.message-content tr:hover {
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.user-message .message-content tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.message-content tr:last-child th,
+.message-content tr:last-child td {
+    border-bottom: none;
+}
+
+/* Code blocks */
+.message-content code {
+    background: rgba(168, 85, 247, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: #A855F7;
+}
+
+.user-message .message-content code {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.message-content pre {
+    background: rgba(168, 85, 247, 0.05);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 12px 0;
+    border-left: 4px solid #A855F7;
+}
+
+.user-message .message-content pre {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid rgba(255, 255, 255, 0.5);
+}
+
+.message-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* Blockquotes */
+.message-content blockquote {
+    margin: 16px 0;
+    padding: 12px 20px;
+    border-left: 4px solid #A855F7;
+    background: rgba(168, 85, 247, 0.05);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+}
+
+.user-message .message-content blockquote {
+    border-left: 4px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Paragraphs */
+.message-content p {
+    margin: 8px 0;
+}
+
+.message-content p:first-child {
+    margin-top: 0;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Strong and emphasis */
+.message-content strong,
+.message-content b {
+    font-weight: 600;
+}
+
+.message-content em,
+.message-content i {
+    font-style: italic;
+}
+
+.message-content u {
+    text-decoration: underline;
+}
+
+/* Dividers */
+.message-content hr {
+    border: none;
+    height: 1px;
+    background: rgba(168, 85, 247, 0.2);
+    margin: 20px 0;
+}
+
+.user-message .message-content hr {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+    .message-content table {
+        font-size: 14px;
+    }
+    
+    .message-content th,
+    .message-content td {
+        padding: 8px 12px;
+    }
+}
+
+.math-error-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    color: #856404;
+}
+
+.math-error-warning h4 {
+    margin: 0 0 10px 0;
+    color: #d63031;
+    font-size: 16px;
+}
+
+.math-error-warning ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.math-error-warning li {
+    margin-bottom: 5px;
+}
+
+.math-error-warning strong {
+    color: #d63031;
+}
+
+.math-error-warning em {
+    font-style: italic;
+    color: #6c757d;
 } 
