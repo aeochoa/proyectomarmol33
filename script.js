@@ -1,6 +1,6 @@
 class ChatApp {
     constructor() {
-        this.webhookUrl = 'https://manun8n.ddns.net/webhook-test/8e843007-4b68-4aba-ae73-68834ba54074';
+        this.webhookUrl = 'https://manun8n.ddns.net/webhook/whatsapp-chatbot';
         this.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbxmXrGsQovpa7lX8dDR2Hm7XbE2B0owCR8ho9p0W1prnNqa-pEmrq1pqJGwKsJlXqlQ2w/exec'; // Google Apps Script directo
         this.selectedFiles = [];
         this.initializeElements();
@@ -220,12 +220,17 @@ class ChatApp {
             }
         } catch (error) {
             console.error('Error en sendMessage:', error);
+            const errorMessage = `❌ Lo siento, ocurrió un error al procesar tu mensaje. Error: ${error.message}`;
+            
             this.addBotResponse({
                 success: false,
-                message: 'Lo siento, ocurrió un error al procesar tu mensaje.',
+                message: errorMessage,
                 error: `Error de conexión: ${error.message}`,
                 timestamp: new Date().toISOString()
             });
+            
+            // Guardar el error en Google Sheets
+            await this.saveMessageToGoogleSheets(message, filesToSend, 'bot', errorMessage);
         } finally {
             this.hideLoading();
             this.sendButton.disabled = false;
